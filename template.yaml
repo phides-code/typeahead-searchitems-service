@@ -1,0 +1,80 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  TypeaheadSearchitemsService:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: "appname-searchitems-service"
+      StageName: Prod
+      Cors:
+        AllowMethods: "'OPTIONS, POST, GET, PUT, DELETE'"
+        AllowHeaders: "'Content-Type'"
+        AllowOrigin: "'http://localhost:3000'" # replace with frontend app URL
+
+  TypeaheadSearchitemsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: com.github.phidescode.JavaDynamoDBService.App::handleRequest
+      Runtime: java17
+      Timeout: 60
+      MemorySize: 512
+      CodeUri: .
+      Policies:
+        - AWSLambdaExecute
+        - SecretsManagerReadWrite
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TypeaheadSearchitemsTable
+      Events:
+        SearchitemsOptions:
+          Type: Api
+          Properties:
+            Path: /searchitems
+            Method: OPTIONS
+            RestApiId: !Ref TypeaheadSearchitemsService
+        GetSearchitem:
+          Type: Api
+          Properties:
+            Path: /searchitems/{id}
+            Method: GET
+            RestApiId: !Ref TypeaheadSearchitemsService
+        GetSearchitems:
+          Type: Api
+          Properties:
+            Path: /searchitems
+            Method: GET
+            RestApiId: !Ref TypeaheadSearchitemsService
+        PutSearchitem:
+          Type: Api
+          Properties:
+            Path: /searchitems
+            Method: POST
+            RestApiId: !Ref TypeaheadSearchitemsService
+        DeleteSearchitem:
+          Type: Api
+          Properties:
+            Path: /searchitems/{id}
+            Method: DELETE
+            RestApiId: !Ref TypeaheadSearchitemsService
+        UpdateSearchitem:
+          Type: Api
+          Properties:
+            Path: /searchitems/{id}
+            Method: PUT
+            RestApiId: !Ref TypeaheadSearchitemsService
+    Metadata:
+      BuildMethod: makefile
+
+  TypeaheadSearchitemsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: TypeaheadSearchitems
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
