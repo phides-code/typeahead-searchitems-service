@@ -11,7 +11,7 @@ jobs:
         runs-on: ubuntu-latest
 
         env:
-            SAM_STACK_NAME: appname-searchitems-service
+            SAM_STACK_NAME: typeahead-searchitems-service
             SAM_REGION: us-east-1
             SAM_CAPABILITIES: CAPABILITY_IAM
 

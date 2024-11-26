@@ -1,8 +1,8 @@
 version = 0.1
 [default.deploy.parameters]
-stack_name = "appname-searchitems-service"
+stack_name = "typeahead-searchitems-service"
 resolve_s3 = true
-s3_prefix = "appname-searchitems-service"
+s3_prefix = "typeahead-searchitems-service"
 region = "us-east-1"
 confirm_changeset = false
 capabilities = "CAPABILITY_IAM"

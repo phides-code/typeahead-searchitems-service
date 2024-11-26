@@ -5,7 +5,7 @@ Resources:
   TypeaheadSearchitemsService:
     Type: AWS::Serverless::Api
     Properties:
-      Name: "appname-searchitems-service"
+      Name: "typeahead-searchitems-service"
       StageName: Prod
       Cors:
         AllowMethods: "'OPTIONS, POST, GET, PUT, DELETE'"
