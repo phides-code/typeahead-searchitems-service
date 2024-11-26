@@ -1,4 +1,7 @@
 .aws-sam
+curl.md
+post-data.json
+put-data.json
 
 ##############################
 ## Java

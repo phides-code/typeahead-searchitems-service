@@ -89,8 +89,6 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
         } catch (InterruptedException | ExecutionException e) {
             Logger.logError("processGetById caught error: ", e);
             return returnError(HttpStatus.INTERNAL_SERVER_ERROR);
-        } finally {
-            dbHandler.closeDbClient();
         }
     }
 
@@ -104,8 +102,6 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
         } catch (InterruptedException | ExecutionException e) {
             Logger.logError("processGetAll caught error: ", e);
             return returnError(HttpStatus.INTERNAL_SERVER_ERROR);
-        } finally {
-            dbHandler.closeDbClient();
         }
     }
 
@@ -124,8 +120,6 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
         } catch (ExecutionException | InterruptedException e) {
             Logger.logError("processPost caught error: ", e);
             return returnError(HttpStatus.INTERNAL_SERVER_ERROR);
-        } finally {
-            dbHandler.closeDbClient();
         }
     }
 
@@ -148,8 +142,6 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
         } catch (ExecutionException | InterruptedException e) {
             Logger.logError("processPost caught error: ", e);
             return returnError(HttpStatus.INTERNAL_SERVER_ERROR);
-        } finally {
-            dbHandler.closeDbClient();
         }
     }
 
@@ -167,8 +159,6 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
         } catch (InterruptedException | ExecutionException e) {
             Logger.logError("processDelete caught error: ", e);
             return returnError(HttpStatus.INTERNAL_SERVER_ERROR);
-        } finally {
-            dbHandler.closeDbClient();
         }
     }
 
