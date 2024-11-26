@@ -19,8 +19,8 @@ https://github.com/aws/aws-sdk-java-v2
 <!-- -   Find and replace `Searchitem`/`Searchitems` with the table name (upper and lowercase A) -->
 <!-- -   Find and replace `us-east-1` with the AWS region -->
 
--   Update the class variables and methods in `BaseEntity.java` to suit your table structure
--   Update the methods in `EntityUtils.java` to suit your table structure and logic.
+<!-- -   Update the class variables and methods in `BaseEntity.java` to suit your table structure -->
+<!-- -   Update the methods in `EntityUtils.java` to suit your table structure and logic. -->
 
 ### Deploy manually
 

@@ -23,40 +23,28 @@ public class EntityUtils {
 
         JsonNode jsonNode = objectMapper.readTree(requestBody);
 
-        if (!jsonNode.has("description") || !jsonNode.get("description").isTextual() || !jsonNode.has("quantity") || !jsonNode.get("quantity").isInt()) {
+        if (!jsonNode.has("content") || !jsonNode.get("content").isTextual()) {
             throw new ClassCastException("Invalid data format");
         }
 
         BaseEntity newEntity = objectMapper.treeToValue(jsonNode, BaseEntity.class);
-
-        if (newEntity.getQuantity() < 0) {
-            throw new ClassCastException("Invalid data format");
-        }
 
         return newEntity;
     }
 
     public static Entity getEntityFromDBItem(Map<String, AttributeValue> item) {
         String itemId = item.get("id").s();
-        String itemDescription = item.get("description").s();
-        int itemQuantity = Integer.parseInt(item.get("quantity").n());
+        String itemContent = item.get("content").s();
 
-        return new Entity(itemId, new BaseEntity(itemDescription, itemQuantity));
+        return new Entity(itemId, new BaseEntity(itemContent));
     }
 
     public static HashMap<String, AttributeValueUpdate> getUpdatedValues(BaseEntity entity) {
         HashMap<String, AttributeValueUpdate> updatedValues = new HashMap<>();
 
-        updatedValues.put("description", AttributeValueUpdate.builder()
+        updatedValues.put("content", AttributeValueUpdate.builder()
                 .value(AttributeValue.builder()
-                        .s(entity.getDescription())
-                        .build())
-                .action(AttributeAction.PUT)
-                .build());
-
-        updatedValues.put("quantity", AttributeValueUpdate.builder()
-                .value(AttributeValue.builder()
-                        .n(entity.getQuantity() + "")
+                        .s(entity.getContent())
                         .build())
                 .action(AttributeAction.PUT)
                 .build());
@@ -71,12 +59,8 @@ public class EntityUtils {
                 .s(entity.getId())
                 .build());
 
-        itemValues.put("description", AttributeValue.builder()
-                .s(entity.getDescription())
-                .build());
-
-        itemValues.put("quantity", AttributeValue.builder()
-                .n(entity.getQuantity() + "")
+        itemValues.put("content", AttributeValue.builder()
+                .s(entity.getContent())
                 .build());
 
         return itemValues;
