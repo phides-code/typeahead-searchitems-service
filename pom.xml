@@ -4,10 +4,10 @@
 		4.0.0
 	</modelVersion>
 	<groupId>
-		com.github.phidescode.JavaDynamoDBService
+		com.github.phidescode.TypeaheadSearchItemsService
 	</groupId>
 	<artifactId>
-		JavaDynamoDBService
+		TypeaheadSearchItemsService
 	</artifactId>
 	<version>
 		1.0-SNAPSHOT
@@ -210,7 +210,7 @@
 						false
 					</createDependencyReducedPom>
 					<finalName>
-						JavaDynamoDBService
+						TypeaheadSearchItemsService
 					</finalName>
 					<filters>
 						<filter>

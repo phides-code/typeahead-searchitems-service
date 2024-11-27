@@ -15,7 +15,7 @@ Resources:
   TypeaheadSearchitemsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: com.github.phidescode.JavaDynamoDBService.App::handleRequest
+      Handler: com.github.phidescode.TypeaheadSearchItemsService.App::handleRequest
       Runtime: java17
       Timeout: 60
       MemorySize: 512

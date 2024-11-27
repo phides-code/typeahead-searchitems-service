@@ -1,4 +1,4 @@
-// package com.github.phidescode.JavaDynamoDBService;
+// package com.github.phidescode.TypeaheadSearchItemsService;
 
 // import static org.junit.jupiter.api.Assertions.assertEquals;
 
