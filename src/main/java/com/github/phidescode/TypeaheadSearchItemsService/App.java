@@ -1,4 +1,4 @@
-package com.github.phidescode.JavaDynamoDBService;
+package com.github.phidescode.TypeaheadSearchItemsService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutionException;
 
 import org.springframework.http.HttpStatus;
 
+import com.amazonaws.secretsmanager.caching.SecretCache;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
@@ -28,6 +29,7 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
     private static HashMap<String, String> headers;
     private static final String ORIGIN_URL = "http://localhost:3000";
     private static final DynamoDBHandler dbHandler = new DynamoDBHandler();
+    private final SecretCache cache = new SecretCache();
 
     public App() {
         headers = new HashMap<>();
@@ -38,6 +40,23 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
     @Override
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent request, Context context) {
         Logger.setLogger(context.getLogger());
+
+        // Extract custom header from the request
+        Map<String, String> requestHeaders = request.getHeaders();
+
+        String apiKey = requestHeaders.get("x-api-key");
+
+        // x-api-key shows up in Camel-Case when run in SAM for some reason
+        if (apiKey == null) {
+            apiKey = requestHeaders.get("X-Api-Key");
+        }
+
+        final String secret = cache.getSecretString("TYPEAHEAD_API_KEY");
+
+        if (apiKey == null || !secret.equals(apiKey)) {
+            Logger.log("Could not authenticate header");
+            return returnError(HttpStatus.BAD_REQUEST);
+        }
 
         String httpMethod = request.getHttpMethod();
         Logger.log("Processing " + httpMethod + " request");
