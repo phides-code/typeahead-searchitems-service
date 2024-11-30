@@ -39,17 +39,28 @@ public class DynamoDBHandler {
     public List<Entity> listEntities() throws InterruptedException, ExecutionException {
         List<Entity> entities = new ArrayList<>();
 
-        ScanRequest scanRequest = ScanRequest.builder()
-                .tableName(TABLE_NAME)
-                .build();
+        Map<String, AttributeValue> token = null;
 
-        CompletableFuture<ScanResponse> scanResponseFuture = dynamoDbClient.scan(scanRequest);
-        ScanResponse scanResponse = scanResponseFuture.get();
+        while (true) {
+            ScanRequest scanRequest = ScanRequest.builder()
+                    .tableName(TABLE_NAME)
+                    .exclusiveStartKey(token)
+                    .build();
 
-        List<Map<String, AttributeValue>> items = scanResponse.items();
+            CompletableFuture<ScanResponse> scanResponseFuture = dynamoDbClient.scan(scanRequest);
+            ScanResponse scanResponse = scanResponseFuture.get();
 
-        for (Map<String, AttributeValue> item : items) {
-            entities.add(EntityUtils.getEntityFromDBItem(item));
+            List<Map<String, AttributeValue>> items = scanResponse.items();
+
+            for (Map<String, AttributeValue> item : items) {
+                entities.add(EntityUtils.getEntityFromDBItem(item));
+            }
+
+            token = scanResponse.lastEvaluatedKey();
+
+            if (token.isEmpty()) {
+                break;
+            }
         }
 
         return entities;
