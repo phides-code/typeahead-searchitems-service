@@ -66,6 +66,27 @@ public class DynamoDBHandler {
         return entities;
     }
 
+    public List<Entity> queryForEntities(String queryString) throws InterruptedException, ExecutionException {
+        List<Entity> entities = new ArrayList<>();
+
+        ScanRequest scanRequest = ScanRequest.builder()
+                .tableName(TABLE_NAME)
+                .filterExpression("contains(content, :queryString)")
+                .expressionAttributeValues(Map.of(":queryString", AttributeValue.builder().s(queryString).build()))
+                .build();
+
+        CompletableFuture<ScanResponse> scanResponseFuture = dynamoDbClient.scan(scanRequest);
+        ScanResponse scanResponse = scanResponseFuture.get();
+
+        List<Map<String, AttributeValue>> items = scanResponse.items();
+
+        for (Map<String, AttributeValue> item : items) {
+            entities.add(EntityUtils.getEntityFromDBItem(item));
+        }
+
+        return entities;
+    }
+
     public Entity getEntity(String id) throws InterruptedException, ExecutionException, NoSuchElementException {
         HashMap<String, AttributeValue> itemKey = new HashMap<>();
         itemKey.put("id", AttributeValue.builder()

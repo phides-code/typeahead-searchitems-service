@@ -44,6 +44,9 @@ Resources:
             Path: /searchitems
             Method: GET
             RestApiId: !Ref TypeaheadSearchitemsService
+            RequestParameters:
+              - method.request.querystring.q:
+                  Required: false
         PutSearchitem:
           Type: Api
           Properties:

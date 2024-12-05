@@ -65,4 +65,8 @@ public class EntityUtils {
 
         return itemValues;
     }
+
+    public static boolean isEmpty(Map<String, String> map) {
+        return map == null || map.isEmpty();
+    }
 }

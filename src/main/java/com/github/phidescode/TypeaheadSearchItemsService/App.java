@@ -55,7 +55,7 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
 
         if (apiKey == null || !secret.equals(apiKey)) {
             Logger.log("Could not authenticate header");
-            return returnError(HttpStatus.BAD_REQUEST);
+            return returnError(HttpStatus.UNAUTHORIZED);
         }
 
         String httpMethod = request.getHttpMethod();
@@ -86,14 +86,44 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
     }
 
     private APIGatewayProxyResponseEvent processGet(APIGatewayProxyRequestEvent request) {
-        String[] pathSegments = request.getPath().split("/");
+        Map<String, String> pathParameters = request.getPathParameters();
+        Map<String, String> queryStringParameters = request.getQueryStringParameters();
 
-        if (pathSegments.length == 3) {
-            String id = pathSegments[2];
-            return processGetById(id);
+        boolean hasPathParameters = !EntityUtils.isEmpty(pathParameters);
+        boolean hasQueryStringParameters = !EntityUtils.isEmpty(queryStringParameters);
+
+        if (!hasPathParameters && !hasQueryStringParameters) {
+            // GET with no parameters
+            return processGetAll();
         }
 
-        return processGetAll();
+        if (hasPathParameters && !hasQueryStringParameters) {
+            // GET with path parameter
+            return processGetById(pathParameters.get("id"));
+        }
+
+        if (!hasPathParameters && hasQueryStringParameters) {
+            // GET with query parameters
+            String query = queryStringParameters.get("q");
+            if (query != null) {
+                return processGetByQuery(query);
+            }
+        }
+
+        return returnError(HttpStatus.BAD_REQUEST);
+    }
+
+    private APIGatewayProxyResponseEvent processGetByQuery(String queryString) {
+        try {
+            List<Entity> entities = dbHandler.queryForEntities(queryString);
+
+            ResponseStructure responseContent = new ResponseStructure(entities, null);
+
+            return createResponse(HttpStatus.OK, responseContent);
+        } catch (InterruptedException | ExecutionException e) {
+            Logger.logError("processGetByQuery caught error: ", e);
+            return returnError(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     private APIGatewayProxyResponseEvent processGetById(String id) {
