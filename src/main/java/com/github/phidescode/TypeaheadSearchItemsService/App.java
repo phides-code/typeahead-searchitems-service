@@ -224,6 +224,7 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
 
         response.setIsBase64Encoded(false);
         response.setStatusCode(httpStatus.value());
+        response.setHeaders(headers);
 
         Map<String, Object> responseBody = new HashMap<>();
 
