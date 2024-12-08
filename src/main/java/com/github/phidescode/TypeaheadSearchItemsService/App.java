@@ -27,14 +27,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
     private static HashMap<String, String> headers;
-    private static final String ORIGIN_URL = "http://localhost:3000";
+    private static final String ORIGIN_URL = "http://localhost:5173";
     private static final DynamoDBHandler dbHandler = new DynamoDBHandler();
     private final SecretCache cache = new SecretCache();
 
     public App() {
         headers = new HashMap<>();
         headers.put("Access-Control-Allow-Origin", ORIGIN_URL);
-        headers.put("Access-Control-Allow-Headers", "Content-Type");
+        headers.put("Access-Control-Allow-Headers", "Content-Type, x-api-key");
     }
 
     @Override
