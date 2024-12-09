@@ -42,6 +42,13 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent request, Context context) {
         Logger.setLogger(context.getLogger());
 
+        String httpMethod = request.getHttpMethod();
+        Logger.log("Processing " + httpMethod + " request");
+
+        if ("OPTIONS".equals(httpMethod)) {
+            return processOptions();
+        }
+
         // Extract custom header from the request
         Map<String, String> requestHeaders = request.getHeaders();
 
@@ -59,9 +66,6 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
             return returnError(HttpStatus.UNAUTHORIZED);
         }
 
-        String httpMethod = request.getHttpMethod();
-        Logger.log("Processing " + httpMethod + " request");
-
         return switch (httpMethod) {
             case "GET" ->
                 processGet(request);
@@ -71,8 +75,6 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
                 processPut(request);
             case "DELETE" ->
                 processDelete(request);
-            case "OPTIONS" ->
-                processOptions();
             default ->
                 returnError(HttpStatus.METHOD_NOT_ALLOWED);
         };
