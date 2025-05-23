@@ -8,7 +8,6 @@ import java.util.concurrent.ExecutionException;
 
 import org.springframework.http.HttpStatus;
 
-import com.amazonaws.secretsmanager.caching.SecretCache;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
@@ -29,7 +28,7 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
     private static HashMap<String, String> headers;
     private static final String ORIGIN_URL = "http://localhost:5173";
     private static final DynamoDBHandler dbHandler = new DynamoDBHandler();
-    private final SecretCache cache = new SecretCache();
+    // private final SecretCache cache = new SecretCache();
 
     public App() {
         headers = new HashMap<>();
@@ -45,27 +44,21 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
         String httpMethod = request.getHttpMethod();
         Logger.log("Processing " + httpMethod + " request");
 
-        if ("OPTIONS".equals(httpMethod)) {
-            return processOptions();
-        }
-
+        // if ("OPTIONS".equals(httpMethod)) {
+        //     return processOptions();
+        // }
         // Extract custom header from the request
-        Map<String, String> requestHeaders = request.getHeaders();
-
-        String apiKey = requestHeaders.get("x-api-key");
-
+        // Map<String, String> requestHeaders = request.getHeaders();
+        // String apiKey = requestHeaders.get("x-api-key");
         // x-api-key shows up in Camel-Case when run in SAM for some reason
-        if (apiKey == null) {
-            apiKey = requestHeaders.get("X-Api-Key");
-        }
-
-        final String secret = cache.getSecretString("TYPEAHEAD_API_KEY");
-
-        if (apiKey == null || !secret.equals(apiKey)) {
-            Logger.log("Could not authenticate header");
-            return returnError(HttpStatus.UNAUTHORIZED);
-        }
-
+        // if (apiKey == null) {
+        //     apiKey = requestHeaders.get("X-Api-Key");
+        // }
+        // final String secret = cache.getSecretString("TYPEAHEAD_API_KEY");
+        // if (apiKey == null || !secret.equals(apiKey)) {
+        //     Logger.log("Could not authenticate header");
+        //     return returnError(HttpStatus.UNAUTHORIZED);
+        // }
         return switch (httpMethod) {
             case "GET" ->
                 processGet(request);
@@ -75,6 +68,8 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
                 processPut(request);
             case "DELETE" ->
                 processDelete(request);
+            case "OPTIONS" ->
+                processOptions();
             default ->
                 returnError(HttpStatus.METHOD_NOT_ALLOWED);
         };

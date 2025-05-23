@@ -1,6 +1,12 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
+Parameters:
+  ApiKeyValue:
+    Type: String
+    NoEcho: true
+    Description: "API Key for the TypeaheadSearchitemsService"
+
 Resources:
   TypeaheadSearchitemsService:
     Type: AWS::Serverless::Api
@@ -12,6 +18,42 @@ Resources:
         AllowHeaders: "'Content-Type, x-api-key'"
         AllowOrigin: "'http://localhost:5173'" # replace with frontend app URL
 
+      Auth:
+        ApiKeyRequired: true
+
+  TypeaheadSearchitemsApiKey:
+    Type: AWS::ApiGateway::ApiKey
+    DependsOn: TypeaheadSearchitemsServiceProdStage
+    Properties:
+      Name: "TypeaheadSearchitemsApiKey"
+      Enabled: true
+      Value: !Ref ApiKeyValue
+      StageKeys:
+        - RestApiId: !Ref TypeaheadSearchitemsService
+          StageName: Prod
+
+  TypeaheadSearchitemsUsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    DependsOn: TypeaheadSearchitemsServiceProdStage
+    Properties:
+      UsagePlanName: "TypeaheadSearchitemsUsagePlan"
+      ApiStages:
+        - ApiId: !Ref TypeaheadSearchitemsService
+          Stage: Prod
+      Throttle:
+        RateLimit: 100
+        BurstLimit: 20
+      Quota:
+        Limit: 10000
+        Period: MONTH
+
+  TypeaheadSearchitemsUsagePlanKey:
+    Type: AWS::ApiGateway::UsagePlanKey
+    Properties:
+      KeyId: !Ref TypeaheadSearchitemsApiKey
+      KeyType: API_KEY
+      UsagePlanId: !Ref TypeaheadSearchitemsUsagePlan
+
   TypeaheadSearchitemsFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -22,7 +64,6 @@ Resources:
       CodeUri: .
       Policies:
         - AWSLambdaExecute
-        - SecretsManagerReadWrite
         - DynamoDBCrudPolicy:
             TableName: !Ref TypeaheadSearchitemsTable
       Events:
@@ -32,18 +73,32 @@ Resources:
             Path: /searchitems
             Method: OPTIONS
             RestApiId: !Ref TypeaheadSearchitemsService
+            Auth:
+              ApiKeyRequired: false
+        SearchitemsOptionsId:
+          Type: Api
+          Properties:
+            Path: /searchitems/{id}
+            Method: OPTIONS
+            RestApiId: !Ref TypeaheadSearchitemsService
+            Auth:
+              ApiKeyRequired: false            
         GetSearchitem:
           Type: Api
           Properties:
             Path: /searchitems/{id}
             Method: GET
             RestApiId: !Ref TypeaheadSearchitemsService
+            Auth:
+              ApiKeyRequired: true
         GetSearchitems:
           Type: Api
           Properties:
             Path: /searchitems
             Method: GET
             RestApiId: !Ref TypeaheadSearchitemsService
+            Auth:
+              ApiKeyRequired: true            
             RequestParameters:
               - method.request.querystring.q:
                   Required: false
@@ -53,18 +108,24 @@ Resources:
             Path: /searchitems
             Method: POST
             RestApiId: !Ref TypeaheadSearchitemsService
+            Auth:
+              ApiKeyRequired: true                        
         DeleteSearchitem:
           Type: Api
           Properties:
             Path: /searchitems/{id}
             Method: DELETE
             RestApiId: !Ref TypeaheadSearchitemsService
+            Auth:
+              ApiKeyRequired: true
         UpdateSearchitem:
           Type: Api
           Properties:
             Path: /searchitems/{id}
             Method: PUT
             RestApiId: !Ref TypeaheadSearchitemsService
+            Auth:
+              ApiKeyRequired: true
     Metadata:
       BuildMethod: makefile
 
