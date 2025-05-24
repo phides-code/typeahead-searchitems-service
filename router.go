@@ -61,6 +61,10 @@ func processGet(ctx context.Context, req events.APIGatewayProxyRequest) (events.
 	if idPresent {
 		return processGetEntityById(ctx, id)
 	} else {
+		queryString, queryStringPresent := req.QueryStringParameters["q"]
+		if queryStringPresent {
+			return processGetEntitiesByQuery(ctx, queryString)
+		}
 		return processGetAll(ctx)
 	}
 }
@@ -85,6 +89,32 @@ func processGetEntityById(ctx context.Context, id string) (events.APIGatewayProx
 	responseJson, err := json.Marshal(response)
 	if err != nil {
 		log.Println("processGetEntityById() error running json.Marshal")
+		return serverError(err)
+	}
+
+	return events.APIGatewayProxyResponse{
+		StatusCode: http.StatusOK,
+		Body:       string(responseJson),
+		Headers:    headers,
+	}, nil
+}
+
+func processGetEntitiesByQuery(ctx context.Context, queryString string) (events.APIGatewayProxyResponse, error) {
+	log.Println("running processGetEntitiesByQuery: " + queryString)
+
+	entities, err := scanForEntities(ctx, queryString)
+	if err != nil {
+		return serverError(err)
+	}
+
+	response := ResponseStructure{
+		Data:         entities,
+		ErrorMessage: nil,
+	}
+
+	responseJson, err := json.Marshal(response)
+	if err != nil {
+		log.Println("processGetEntitiesByQuery() error running json.Marshal")
 		return serverError(err)
 	}
 

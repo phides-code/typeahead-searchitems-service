@@ -75,6 +75,45 @@ func getEntity(ctx context.Context, id string) (*Entity, error) {
 	return entity, nil
 }
 
+func scanForEntities(ctx context.Context, queryString string) ([]Entity, error) {
+	lowercaseQuery := strings.ToLower(queryString)
+
+	var token map[string]types.AttributeValue
+	entities := make([]Entity, 0)
+
+	for {
+		input := &dynamodb.ScanInput{
+			TableName:        aws.String(TableName),
+			FilterExpression: aws.String("contains(lowerCaseContent, :query)"),
+			ExpressionAttributeValues: map[string]types.AttributeValue{
+				":query": &types.AttributeValueMemberS{Value: lowercaseQuery},
+			},
+			ExclusiveStartKey: token,
+		}
+
+		result, err := db.Scan(ctx, input)
+		if err != nil {
+			log.Println("scanForEntities() error running db.Scan")
+			return nil, err
+		}
+
+		var fetchedEntities []Entity
+		err = attributevalue.UnmarshalListOfMaps(result.Items, &fetchedEntities)
+		if err != nil {
+			log.Println("scanForEntities() error running attributevalue.UnmarshalListOfMaps")
+			return nil, err
+		}
+
+		entities = append(entities, fetchedEntities...)
+		token = result.LastEvaluatedKey
+		if token == nil {
+			break
+		}
+	}
+
+	return entities, nil
+}
+
 func listEntities(ctx context.Context) ([]Entity, error) {
 	entities := make([]Entity, 0)
 
