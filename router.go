@@ -100,8 +100,6 @@ func processGetEntityById(ctx context.Context, id string) (events.APIGatewayProx
 }
 
 func processGetEntitiesByQuery(ctx context.Context, queryString string) (events.APIGatewayProxyResponse, error) {
-	log.Println("running processGetEntitiesByQuery: " + queryString)
-
 	entities, err := scanForEntities(ctx, queryString)
 	if err != nil {
 		return serverError(err)
