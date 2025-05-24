@@ -10,14 +10,14 @@ Parameters:
 Resources:
   TypeaheadSearchitemsService:
     Type: AWS::Serverless::Api
+    Description: "Serverless API for CRUD operations"
     Properties:
       Name: "typeahead-searchitems-service"
       StageName: Prod
       Cors:
         AllowMethods: "'OPTIONS, POST, GET, PUT, DELETE'"
         AllowHeaders: "'Content-Type, x-api-key'"
-        AllowOrigin: "'http://localhost:5173'" # replace with frontend app URL
-
+        AllowOrigin: "'http://localhost:5173'" # replace for production
       Auth:
         ApiKeyRequired: true
 
@@ -57,11 +57,10 @@ Resources:
   TypeaheadSearchitemsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: com.github.phidescode.TypeaheadSearchItemsService.App::handleRequest
-      Runtime: java17
-      Timeout: 60
+      Timeout: 10
+      Handler: bootstrap
+      Runtime: provided.al2023
       MemorySize: 512
-      CodeUri: .
       Policies:
         - AWSLambdaExecute
         - DynamoDBCrudPolicy:
@@ -82,7 +81,7 @@ Resources:
             Method: OPTIONS
             RestApiId: !Ref TypeaheadSearchitemsService
             Auth:
-              ApiKeyRequired: false            
+              ApiKeyRequired: false
         GetSearchitem:
           Type: Api
           Properties:
@@ -98,10 +97,7 @@ Resources:
             Method: GET
             RestApiId: !Ref TypeaheadSearchitemsService
             Auth:
-              ApiKeyRequired: true            
-            RequestParameters:
-              - method.request.querystring.q:
-                  Required: false
+              ApiKeyRequired: true
         PutSearchitem:
           Type: Api
           Properties:
@@ -109,7 +105,7 @@ Resources:
             Method: POST
             RestApiId: !Ref TypeaheadSearchitemsService
             Auth:
-              ApiKeyRequired: true                        
+              ApiKeyRequired: true
         DeleteSearchitem:
           Type: Api
           Properties:

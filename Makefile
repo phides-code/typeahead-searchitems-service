@@ -3,10 +3,7 @@ build:
 	sam build
 
 build-TypeaheadSearchitemsFunction:
-	mvn -B clean package
-	echo "ARTIFACTS_DIR: $(ARTIFACTS_DIR)"
-	mkdir -p $(ARTIFACTS_DIR)/lib
-	cp ./target/*.jar $(ARTIFACTS_DIR)/lib/
+	GOOS=linux CGO_ENABLED=0 go build -tags lambda.norpc -o $(ARTIFACTS_DIR)/bootstrap .
 
 .PHONY: init
 init: build

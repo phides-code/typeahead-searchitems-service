@@ -1,4 +1,7 @@
-name: Build and Deploy Java Lambda
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: Go
 
 on:
     push:
@@ -7,27 +10,21 @@ on:
         branches: ['main']
 
 jobs:
-    build-and-deploy:
+    build:
         runs-on: ubuntu-latest
-
         env:
             SAM_STACK_NAME: typeahead-searchitems-service
             SAM_REGION: us-east-1
             SAM_CAPABILITIES: CAPABILITY_IAM
-
         steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
+            - name: Checkout
+              uses: actions/checkout@v4.2.1
 
-            - name: Set up JDK 17
-              uses: actions/setup-java@v4.2.1
-              with:
-                  java-version: '17'
-                  distribution: 'corretto'
-                  cache: 'maven'
+            - name: Set up Go
+              uses: actions/setup-go@v5.0.2
 
-            - name: SAM Build
-              run: make build
+            - name: Build
+              run: go build -tags lambda.norpc -o bootstrap -ldflags "-linkmode external -extldflags -static" ./...
 
             - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v4
