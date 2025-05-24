@@ -17,22 +17,6 @@ import (
 	"github.com/google/uuid"
 )
 
-type Entity struct {
-	Id        string `json:"id" dynamodbav:"id"`
-	Content   string `json:"content" dynamodbav:"content"`
-	CreatedOn uint64 `json:"createdOn" dynamodbav:"createdOn"`
-
-	LowerCaseContent string `json:"lowerCaseContent" dynamodbav:"lowerCaseContent"`
-}
-
-type NewEntity struct {
-	Content string `json:"content" validate:"required"`
-}
-
-type UpdatedEntity struct {
-	Content string `json:"content" validate:"required"`
-}
-
 func getDbClient() (*dynamodb.Client, error) {
 	sdkConfig, err := config.LoadDefaultConfig(context.TODO())
 	dbClient := dynamodb.NewFromConfig(sdkConfig)

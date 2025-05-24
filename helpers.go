@@ -55,3 +55,22 @@ func mergeHeaders(baseHeaders, additionalHeaders map[string]string) map[string]s
 	}
 	return mergedHeaders
 }
+
+func toResponseEntity(e *Entity) *ResponseEntity {
+	if e == nil {
+		return nil
+	}
+	return &ResponseEntity{
+		Id:        e.Id,
+		Content:   e.Content,
+		CreatedOn: e.CreatedOn,
+	}
+}
+
+func toResponseEntitySlice(entities []Entity) []ResponseEntity {
+	responses := make([]ResponseEntity, len(entities))
+	for i, e := range entities {
+		responses[i] = *toResponseEntity(&e)
+	}
+	return responses
+}

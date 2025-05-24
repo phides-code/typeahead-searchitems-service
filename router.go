@@ -12,8 +12,8 @@ import (
 )
 
 type ResponseStructure struct {
-	Data         interface{} `json:"data"`
-	ErrorMessage *string     `json:"errorMessage"` // can be string or nil
+	Data         any     `json:"data"`
+	ErrorMessage *string `json:"errorMessage"` // can be string or nil
 }
 
 var validate *validator.Validate = validator.New()
@@ -82,7 +82,7 @@ func processGetEntityById(ctx context.Context, id string) (events.APIGatewayProx
 	}
 
 	response := ResponseStructure{
-		Data:         entity,
+		Data:         toResponseEntity(entity),
 		ErrorMessage: nil,
 	}
 
@@ -108,7 +108,7 @@ func processGetEntitiesByQuery(ctx context.Context, queryString string) (events.
 	}
 
 	response := ResponseStructure{
-		Data:         entities,
+		Data:         toResponseEntitySlice(entities),
 		ErrorMessage: nil,
 	}
 
@@ -134,7 +134,7 @@ func processGetAll(ctx context.Context) (events.APIGatewayProxyResponse, error) 
 	}
 
 	response := ResponseStructure{
-		Data:         entities,
+		Data:         toResponseEntitySlice(entities),
 		ErrorMessage: nil,
 	}
 
@@ -173,7 +173,7 @@ func processPost(ctx context.Context, req events.APIGatewayProxyRequest) (events
 	}
 
 	response := ResponseStructure{
-		Data:         entity,
+		Data:         toResponseEntity(entity),
 		ErrorMessage: nil,
 	}
 
@@ -227,7 +227,7 @@ func processPut(ctx context.Context, req events.APIGatewayProxyRequest) (events.
 	}
 
 	response := ResponseStructure{
-		Data:         entity,
+		Data:         toResponseEntity(entity),
 		ErrorMessage: nil,
 	}
 
@@ -267,7 +267,7 @@ func processDelete(ctx context.Context, req events.APIGatewayProxyRequest) (even
 	}
 
 	response := ResponseStructure{
-		Data:         entity,
+		Data:         toResponseEntity(entity),
 		ErrorMessage: nil,
 	}
 
